@@ -1,3 +1,74 @@
-body{
-	background:var(--bg);
+body {
+    background: var(--bg);
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+h1 {
+    color: var(--main);
+}
+
+.controls, .export-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#game-wrapper {
+    position: relative;
+    margin: 20px;
+}
+
+#game {
+    display: grid;
+    grid-template-rows: repeat(var(--grid-rows, 10), 40px);
+    grid-template-columns: repeat(var(--grid-cols, 10), 40px);
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    background-color: var(--stateEmpty);
+    cursor: pointer;
+}
+
+.cell.red {
+    background-color: var(--stateColored);
+}
+
+.cell.white {
+    background-color: var(--stateWhite);
+}
+
+.border-h, .border-v {
+    position: absolute;
+    background-color: var(--cellBorder);
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.border-h.thick, .border-v.thick {
+    background-color: var(--main);
+}
+
+.border-h {
+    height: 2px;
+    transform-origin: top;
+}
+.border-h.thick {
+    height: 6px;
+    transform: translateY(-2px);
+}
+
+.border-v {
+    width: 2px;
+    transform-origin: left;
+}
+.border-v.thick {
+    width: 6px;
+    transform: translateX(-2px);
 }
