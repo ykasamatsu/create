@@ -109,3 +109,25 @@ h1 {
     width: 7px;
     transform: translateX(-3px);
 }
+
+.io-controls {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.import-controls, .export-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.output-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
