@@ -12,10 +12,45 @@ h1 {
     color: var(--main);
 }
 
-.controls, .export-controls {
+.export-controls {
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+.editor-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.middle-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.top-controls, .bottom-controls {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.left-controls, .right-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+.editor-area button {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 #game-wrapper {

@@ -14,17 +14,29 @@
 <body class="light">
     <h1>グリッドエディタ</h1>
 
-    <div class="controls">
-        <label for="rows">行数:</label>
-        <input type="number" id="rows" value="10" min="1">
-        <label for="cols">列数:</label>
-        <input type="number" id="cols" value="10" min="1">
-        <button id="resize-btn">サイズ変更</button>
+    <div class="editor-area">
+        <div class="top-controls">
+            <button id="add-row-top" title="上に行を追加">+</button>
+            <button id="remove-row-top" title="上の行を削除">-</button>
+        </div>
+        <div class="middle-controls">
+            <div class="left-controls">
+                <button id="add-col-left" title="左に列を追加">+</button><br>
+                <button id="remove-col-left" title="左の列を削除">-</button>
+            </div>
+            <div id="game-wrapper">
+                <div id="game"></div>
+            </div>
+            <div class="right-controls">
+                <button id="add-col-right" title="右に列を追加">+</button><br>
+                <button id="remove-col-right" title="右の列を削除">-</button>
+            </div>
+        </div>
+        <div class="bottom-controls">
+            <button id="add-row-bottom" title="下に行を追加">+</button>
+            <button id="remove-row-bottom" title="下の行を削除">-</button>
+        </div>
     </div>
-
-	<div id="game-wrapper">
-		<div id="game"></div>
-	</div>
 
     <div class="export-controls">
         <button id="export-btn">エクスポート</button>
