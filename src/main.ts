@@ -250,6 +250,84 @@ class Grid {
 
         return buffer;
     }
+
+    importState(binaryString: string) {
+        try {
+            const buffer = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                buffer[i] = binaryString.charCodeAt(i);
+            }
+
+            let offset = 0;
+            const rows = buffer[offset++];
+            const cols = buffer[offset++];
+
+            const newCellStates = Array(rows).fill(null).map(() => Array(cols).fill(CellState.EMPTY));
+            const newHorizontalBorders = Array(rows + 1).fill(null).map(() => Array(cols).fill(false));
+            const newVerticalBorders = Array(rows).fill(null).map(() => Array(cols + 1).fill(false));
+
+            // Unpack Cell states
+            let currentByte = buffer[offset++];
+            let bitPosition = 0;
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    newCellStates[i][j] = (currentByte >> bitPosition) & 0b11; // Get 2 bits
+                    bitPosition += 2;
+                    if (bitPosition >= 8) {
+                        currentByte = buffer[offset++];
+                        bitPosition = 0;
+                    }
+                }
+            }
+
+            // Unpack Horizontal borders
+            if (offset < buffer.length) {
+                currentByte = buffer[offset++];
+                bitPosition = 0;
+                for (let i = 0; i < rows + 1; i++) {
+                    for (let j = 0; j < cols; j++) {
+                        if(bitPosition >= 8) {
+                            currentByte = buffer[offset++];
+                            bitPosition = 0;
+                        }
+                        if (currentByte !== undefined) {
+                            newHorizontalBorders[i][j] = ((currentByte >> bitPosition) & 1) === 1;
+                        }
+                        bitPosition += 1;
+                    }
+                }
+            }
+
+            // Unpack Vertical borders
+            if (offset < buffer.length) {
+                currentByte = buffer[offset++];
+                bitPosition = 0;
+                for (let i = 0; i < rows; i++) {
+                    for (let j = 0; j < cols + 1; j++) {
+                        if(bitPosition >= 8) {
+                            currentByte = buffer[offset++];
+                            bitPosition = 0;
+                        }
+                        if (currentByte !== undefined) {
+                            newVerticalBorders[i][j] = ((currentByte >> bitPosition) & 1) === 1;
+                        }
+                        bitPosition += 1;
+                    }
+                }
+            }
+
+            this.rows = rows;
+            this.cols = cols;
+            this.cellStates = newCellStates;
+            this.horizontalBorders = newHorizontalBorders;
+            this.verticalBorders = newVerticalBorders;
+
+            this.render();
+        } catch (e) {
+            console.error("Failed to import state:", e);
+            alert("無効な盤面データです。");
+        }
+    }
 }
 
 let grid: Grid;
@@ -273,6 +351,7 @@ function initialize() {
 
     const exportBtn = document.getElementById('export-btn')!;
     const exportOutput = document.getElementById('export-output') as HTMLTextAreaElement;
+    const preBase64Output = document.getElementById('pre-base64-output') as HTMLTextAreaElement;
     exportBtn.addEventListener('click', () => {
         const binaryData = grid.exportState();
         let binaryString = '';
@@ -280,12 +359,29 @@ function initialize() {
             binaryString += String.fromCharCode(byte);
         });
 
+        preBase64Output.value = binaryString;
+
         try {
             const base64String = btoa(binaryString);
             exportOutput.value = base64String;
         } catch (e) {
             console.error("Failed to encode state to Base64:", e);
             exportOutput.value = "Error encoding data.";
+        }
+    });
+
+    const importBtn = document.getElementById('import-btn')!;
+    const importInput = document.getElementById('import-input') as HTMLTextAreaElement;
+    importBtn.addEventListener('click', () => {
+        const base64String = importInput.value;
+        if (!base64String) return;
+
+        try {
+            const binaryString = atob(base64String);
+            grid.importState(binaryString);
+        } catch (e) {
+            console.error("Failed to import state from Base64:", e);
+            alert("無効なBase64データです。");
         }
     });
 }

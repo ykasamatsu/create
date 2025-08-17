@@ -38,9 +38,24 @@
         </div>
     </div>
 
-    <div class="export-controls">
-        <button id="export-btn">エクスポート</button>
-        <textarea id="export-output" readonly rows="4" cols="50"></textarea>
+    <div class="io-controls">
+        <div class="import-controls">
+            <h3>インポート</h3>
+            <textarea id="import-input" rows="4" cols="50" placeholder="ここに盤面データを貼り付け"></textarea>
+            <button id="import-btn">インポート</button>
+        </div>
+        <div class="export-controls">
+            <h3>エクスポート</h3>
+            <button id="export-btn">エクスポート</button>
+            <div class="output-group">
+                <label for="pre-base64-output">元データ:</label>
+                <textarea id="pre-base64-output" readonly rows="2" cols="50"></textarea>
+            </div>
+            <div class="output-group">
+                <label for="export-output">Base64:</label>
+                <textarea id="export-output" readonly rows="2" cols="50"></textarea>
+            </div>
+        </div>
     </div>
 
 	<script type="module" src="./src/main.ts"></script>
