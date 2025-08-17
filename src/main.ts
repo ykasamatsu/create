@@ -122,14 +122,111 @@ class Grid {
         }
     }
 
-    exportState() {
-        return {
-            rows: this.rows,
-            cols: this.cols,
-            cellStates: this.cellStates,
-            horizontalBorders: this.horizontalBorders,
-            verticalBorders: this.verticalBorders,
-        };
+    resize(newRows: number, newCols: number) {
+        const newCellStates = Array(newRows).fill(null).map(() => Array(newCols).fill(CellState.EMPTY));
+        const newHorizontalBorders = Array(newRows + 1).fill(null).map(() => Array(newCols).fill(false));
+        const newVerticalBorders = Array(newRows).fill(null).map(() => Array(newCols + 1).fill(false));
+
+        const rowsToCopy = Math.min(this.rows, newRows);
+        const colsToCopy = Math.min(this.cols, newCols);
+
+        // Copy cell states
+        for (let i = 0; i < rowsToCopy; i++) {
+            for (let j = 0; j < colsToCopy; j++) {
+                newCellStates[i][j] = this.cellStates[i][j];
+            }
+        }
+
+        // Copy horizontal borders
+        for (let i = 0; i < Math.min(this.rows + 1, newRows + 1); i++) {
+            for (let j = 0; j < colsToCopy; j++) {
+                newHorizontalBorders[i][j] = this.horizontalBorders[i][j];
+            }
+        }
+
+        // Copy vertical borders
+        for (let i = 0; i < rowsToCopy; i++) {
+            for (let j = 0; j < Math.min(this.cols + 1, newCols + 1); j++) {
+                newVerticalBorders[i][j] = this.verticalBorders[i][j];
+            }
+        }
+
+        this.rows = newRows;
+        this.cols = newCols;
+        this.cellStates = newCellStates;
+        this.horizontalBorders = newHorizontalBorders;
+        this.verticalBorders = newVerticalBorders;
+
+        this.render();
+    }
+
+    exportState(): Uint8Array {
+        const cellDataSize = Math.ceil((this.rows * this.cols) / 4);
+        const hBorderDataSize = Math.ceil(((this.rows + 1) * this.cols) / 8);
+        const vBorderDataSize = Math.ceil((this.rows * (this.cols + 1)) / 8);
+
+        const buffer = new Uint8Array(2 + cellDataSize + hBorderDataSize + vBorderDataSize);
+        let offset = 0;
+
+        // Header
+        buffer[offset++] = this.rows;
+        buffer[offset++] = this.cols;
+
+        // Cell states (2 bits per cell)
+        let currentByte = 0;
+        let bitPosition = 0;
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                currentByte |= (this.cellStates[i][j] << bitPosition);
+                bitPosition += 2;
+                if (bitPosition >= 8) {
+                    buffer[offset++] = currentByte;
+                    currentByte = 0;
+                    bitPosition = 0;
+                }
+            }
+        }
+        if (bitPosition > 0) {
+            buffer[offset++] = currentByte;
+        }
+
+        // Horizontal borders (1 bit per border)
+        currentByte = 0;
+        bitPosition = 0;
+        for (let i = 0; i < this.rows + 1; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                currentByte |= ((this.horizontalBorders[i][j] ? 1 : 0) << bitPosition);
+                bitPosition += 1;
+                if (bitPosition >= 8) {
+                    buffer[offset++] = currentByte;
+                    currentByte = 0;
+                    bitPosition = 0;
+                }
+            }
+        }
+        if (bitPosition > 0) {
+            buffer[offset++] = currentByte;
+        }
+
+        // Vertical borders (1 bit per border)
+        currentByte = 0;
+        bitPosition = 0;
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols + 1; j++) {
+                currentByte |= ((this.verticalBorders[i][j] ? 1 : 0) << bitPosition);
+                bitPosition += 1;
+                if (bitPosition >= 8) {
+                    buffer[offset++] = currentByte;
+                    currentByte = 0;
+                    bitPosition = 0;
+                }
+            }
+        }
+        if (bitPosition > 0) {
+            buffer[offset++] = currentByte;
+        }
+
+        return buffer;
     }
 }
 
@@ -145,17 +242,20 @@ function initialize() {
     resizeBtn.addEventListener('click', () => {
         const newRows = parseInt(rowsInput.value, 10);
         const newCols = parseInt(colsInput.value, 10);
-        grid = new Grid(newRows, newCols);
-        grid.render();
+        grid.resize(newRows, newCols);
     });
 
     const exportBtn = document.getElementById('export-btn')!;
     const exportOutput = document.getElementById('export-output') as HTMLTextAreaElement;
     exportBtn.addEventListener('click', () => {
-        const state = grid.exportState();
-        const jsonString = JSON.stringify(state);
+        const binaryData = grid.exportState();
+        let binaryString = '';
+        binaryData.forEach((byte) => {
+            binaryString += String.fromCharCode(byte);
+        });
+
         try {
-            const base64String = btoa(jsonString);
+            const base64String = btoa(binaryString);
             exportOutput.value = base64String;
         } catch (e) {
             console.error("Failed to encode state to Base64:", e);
