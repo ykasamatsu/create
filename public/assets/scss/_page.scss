@@ -56,19 +56,21 @@ h1 {
 }
 
 .border-h {
-    height: 2px;
+    height: 5px;
+    transform: translateY(-2px);
     transform-origin: top;
 }
 .border-h.thick {
-    height: 6px;
-    transform: translateY(-2px);
+    height: 7px;
+    transform: translateY(-3px);
 }
 
 .border-v {
-    width: 2px;
+    width: 5px;
+    transform: translateX(-2px);
     transform-origin: left;
 }
 .border-v.thick {
-    width: 6px;
-    transform: translateX(-2px);
+    width: 7px;
+    transform: translateX(-3px);
 }
