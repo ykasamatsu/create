@@ -1,0 +1,25 @@
+@charset "utf-8";
+
+$schemes: light, dark, test;
+
+$scheme-colors: (
+  bg: (rgb(210, 210, 210), rgb(60, 60, 60), rgba(60,60,60)),
+  main: (rgb(0,0,0), rgb(240, 240, 240), rgba(255,255,255)),
+
+	active:(rgb(0,0,0), rgb(240, 240, 240), rgba(240,240,240)),
+	deactive: (rgb(180,180,180), rgb(85, 85, 85), rgba(85,85,85)),
+
+	cellBorder: (rgba(0,0,0,0.6), rgb(0,0,0,0.6), rgba(0,0,0,1)),
+  stateEmpty: (rgb(160, 160, 160), rgb(87, 87, 87), rgba(185,175,165)),
+	stateColored: (rgb(255 42 121), rgb(255 42 121), rgba(255,42,121)),
+	stateWhite: (rgb(255, 255, 255), rgb(255, 255, 255), rgba(240,240,240))
+);
+
+@each $scheme in $schemes {
+  .#{$scheme} {
+    @each $name, $colors in $scheme-colors {
+      $color: nth($colors, index($schemes, $scheme));
+      --#{$name}: #{$color};
+    }
+  }
+}

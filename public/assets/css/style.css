@@ -1,0 +1,42 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.light {
+  --bg: rgb(210, 210, 210);
+  --main: rgb(0, 0, 0);
+  --active: rgb(0, 0, 0);
+  --deactive: rgb(180, 180, 180);
+  --cellBorder: rgba(0, 0, 0, 0.6);
+  --stateEmpty: rgb(160, 160, 160);
+  --stateColored: rgb(255, 42, 121);
+  --stateWhite: rgb(255, 255, 255);
+}
+
+.dark {
+  --bg: rgb(60, 60, 60);
+  --main: rgb(240, 240, 240);
+  --active: rgb(240, 240, 240);
+  --deactive: rgb(85, 85, 85);
+  --cellBorder: rgba(0, 0, 0, 0.6);
+  --stateEmpty: rgb(87, 87, 87);
+  --stateColored: rgb(255, 42, 121);
+  --stateWhite: rgb(255, 255, 255);
+}
+
+.test {
+  --bg: rgb(60, 60, 60);
+  --main: rgb(255, 255, 255);
+  --active: rgb(240, 240, 240);
+  --deactive: rgb(85, 85, 85);
+  --cellBorder: rgb(0, 0, 0);
+  --stateEmpty: rgb(185, 175, 165);
+  --stateColored: rgb(255, 42, 121);
+  --stateWhite: rgb(240, 240, 240);
+}
+
+body {
+  background: var(--bg);
+}

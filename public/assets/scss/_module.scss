@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+//------------------------------------------------------------
+//mediaquery
+//------------------------------------------------------------
+
+$break_sp:900;
+
+$breakpoints: (
+	'sp': 'screen and (max-width: #{$break_sp}px)',
+	'min1000': 'screen and (max-width: 1000px)',
+	'pc': 'screen and (min-width: #{$break_sp+1}px)',
+	//'md': 'screen and (min-width: 768px) and (max-width: 1300px)',
+	//'max375': 'screen and (max-width: 375px)',
+	//'min375': 'screen and (max-width: 376px)',
+	) !default;
+
+@mixin mq($breakpoint: sp) {
+	@media #{map-get($breakpoints, $breakpoint)} {
+		@content;
+	}
+}
+
+@function vw($px, $viewport:null) {
+	@if $viewport == null{
+		$viewport:$break_sp;
+	}
+	@return calc($px / $viewport) * (100vw);
+}
