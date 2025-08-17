@@ -1,7 +1,5 @@
 const gameWrapper = document.getElementById('game-wrapper')!;
 const gameContainer = document.getElementById('game')!;
-const rowsInput = document.getElementById('rows') as HTMLInputElement;
-const colsInput = document.getElementById('cols') as HTMLInputElement;
 
 const CELL_SIZE = 40;
 
@@ -122,41 +120,65 @@ class Grid {
         }
     }
 
-    resize(newRows: number, newCols: number) {
-        const newCellStates = Array(newRows).fill(null).map(() => Array(newCols).fill(CellState.EMPTY));
-        const newHorizontalBorders = Array(newRows + 1).fill(null).map(() => Array(newCols).fill(false));
-        const newVerticalBorders = Array(newRows).fill(null).map(() => Array(newCols + 1).fill(false));
+    addRow(position: 'top' | 'bottom') {
+        this.rows++;
+        const newCellRow = Array(this.cols).fill(CellState.EMPTY);
+        const newHorizontalBorderRow = Array(this.cols).fill(false);
+        const newVerticalBorderRow = Array(this.cols + 1).fill(false);
 
-        const rowsToCopy = Math.min(this.rows, newRows);
-        const colsToCopy = Math.min(this.cols, newCols);
-
-        // Copy cell states
-        for (let i = 0; i < rowsToCopy; i++) {
-            for (let j = 0; j < colsToCopy; j++) {
-                newCellStates[i][j] = this.cellStates[i][j];
-            }
+        if (position === 'top') {
+            this.cellStates.unshift(newCellRow);
+            this.horizontalBorders.unshift(newHorizontalBorderRow);
+            this.verticalBorders.unshift(newVerticalBorderRow);
+        } else { // bottom
+            this.cellStates.push(newCellRow);
+            this.horizontalBorders.push(newHorizontalBorderRow);
+            this.verticalBorders.push(newVerticalBorderRow);
         }
+        this.render();
+    }
 
-        // Copy horizontal borders
-        for (let i = 0; i < Math.min(this.rows + 1, newRows + 1); i++) {
-            for (let j = 0; j < colsToCopy; j++) {
-                newHorizontalBorders[i][j] = this.horizontalBorders[i][j];
-            }
+    removeRow(position: 'top' | 'bottom') {
+        if (this.rows <= 1) return;
+        this.rows--;
+        if (position === 'top') {
+            this.cellStates.shift();
+            this.horizontalBorders.shift();
+            this.verticalBorders.shift();
+        } else { // bottom
+            this.cellStates.pop();
+            this.horizontalBorders.pop();
+            this.verticalBorders.pop();
         }
+        this.render();
+    }
 
-        // Copy vertical borders
-        for (let i = 0; i < rowsToCopy; i++) {
-            for (let j = 0; j < Math.min(this.cols + 1, newCols + 1); j++) {
-                newVerticalBorders[i][j] = this.verticalBorders[i][j];
-            }
+    addCol(position: 'left' | 'right') {
+        this.cols++;
+        if (position === 'left') {
+            this.cellStates.forEach(row => row.unshift(CellState.EMPTY));
+            this.horizontalBorders.forEach(row => row.unshift(false));
+            this.verticalBorders.forEach(row => row.unshift(false));
+        } else { // right
+            this.cellStates.forEach(row => row.push(CellState.EMPTY));
+            this.horizontalBorders.forEach(row => row.push(false));
+            this.verticalBorders.forEach(row => row.push(false));
         }
+        this.render();
+    }
 
-        this.rows = newRows;
-        this.cols = newCols;
-        this.cellStates = newCellStates;
-        this.horizontalBorders = newHorizontalBorders;
-        this.verticalBorders = newVerticalBorders;
-
+    removeCol(position: 'left' | 'right') {
+        if (this.cols <= 1) return;
+        this.cols--;
+        if (position === 'left') {
+            this.cellStates.forEach(row => row.shift());
+            this.horizontalBorders.forEach(row => row.shift());
+            this.verticalBorders.forEach(row => row.shift());
+        } else { // right
+            this.cellStates.forEach(row => row.pop());
+            this.horizontalBorders.forEach(row => row.pop());
+            this.verticalBorders.forEach(row => row.pop());
+        }
         this.render();
     }
 
@@ -233,17 +255,21 @@ class Grid {
 let grid: Grid;
 
 function initialize() {
-    const initialRows = parseInt(rowsInput.value, 10);
-    const initialCols = parseInt(colsInput.value, 10);
-    grid = new Grid(initialRows, initialCols);
+    grid = new Grid(10, 10); // Start with a default 10x10 grid
     grid.render();
 
-    const resizeBtn = document.getElementById('resize-btn')!;
-    resizeBtn.addEventListener('click', () => {
-        const newRows = parseInt(rowsInput.value, 10);
-        const newCols = parseInt(colsInput.value, 10);
-        grid.resize(newRows, newCols);
-    });
+    // Add/Remove Row buttons
+    document.getElementById('add-row-top')!.addEventListener('click', () => grid.addRow('top'));
+    document.getElementById('remove-row-top')!.addEventListener('click', () => grid.removeRow('top'));
+    document.getElementById('add-row-bottom')!.addEventListener('click', () => grid.addRow('bottom'));
+    document.getElementById('remove-row-bottom')!.addEventListener('click', () => grid.removeRow('bottom'));
+
+    // Add/Remove Col buttons
+    document.getElementById('add-col-left')!.addEventListener('click', () => grid.addCol('left'));
+    document.getElementById('remove-col-left')!.addEventListener('click', () => grid.removeCol('left'));
+    document.getElementById('add-col-right')!.addEventListener('click', () => grid.addCol('right'));
+    document.getElementById('remove-col-right')!.addEventListener('click', () => grid.removeCol('right'));
+
 
     const exportBtn = document.getElementById('export-btn')!;
     const exportOutput = document.getElementById('export-output') as HTMLTextAreaElement;
